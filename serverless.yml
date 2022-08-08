@@ -1,0 +1,77 @@
+org: todoo
+app: todo
+service: todo
+frameworkVersion: "3"
+
+custom:
+  tableName: "todo-table-${sls:stage}"
+  serverless-offline:
+    httpPort: 4000
+
+plugins:
+  - serverless-offline
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - Fn::GetAtt: [TodoTable, Arn]
+  environment:
+    TABLE_NAME: ${self:custom.tableName}
+
+functions:
+  getAllTodos:
+    handler: lambdas/todo/getAllTodos.handler
+    events:
+      - httpApi:
+          method: GET
+          path: /todo/all
+  getTodo:
+    handler: lambdas/todo/getTodo.handler
+    events:
+      - httpApi:
+          method: GET
+          path: /todo/{id}
+  createTodo:
+    handler: lambdas/todo/createTodo.handler
+    events:
+      - httpApi:
+          method: POST
+          path: /todo
+  updateTodo:
+    handler: lambdas/todo/updateTodo.handler
+    events:
+      - httpApi:
+          method: PUT
+          path: /todo/{id}
+  deleteTodo:
+    handler: lambdas/todo/deleteTodo.handler
+    events:
+      - httpApi:
+          method: DELETE
+          path: /todo/{id}
+
+resources:
+  Resources:
+    TodoTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:custom.tableName}

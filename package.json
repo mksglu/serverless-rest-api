@@ -1,0 +1,27 @@
+{
+  "name": "todo",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "dev": "npm-watch dev:serverless",
+    "dev:serverless": "serverless offline start"
+  },
+  "watch": {
+    "dev:serverless": {
+      "patterns": [
+        "*lambdas/**"
+      ],
+      "extensions": "js",
+      "quiet": true
+    }
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "serverless-http": "^3.0.1",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "npm-watch": "^0.11.0",
+    "serverless-offline": "^9.1.6"
+  }
+}
